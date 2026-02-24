@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mood Space AI — God Mode</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#0b0f1a;
+color:white;
+overflow:hidden;
+transition:background 1s;
+}
+
+/* cosmic particles */
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+/* glass card */
+.card{
+width:90%;
+max-width:650px;
+padding:35px;
+border-radius:22px;
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(20px);
+box-shadow:0 0 40px rgba(0,0,0,.6);
+text-align:center;
+animation:fade .8s ease;
+}
+
+@keyframes fade{
+from{opacity:0;transform:translateY(30px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+h1{margin-bottom:15px}
+
+input{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:none;
+margin-top:10px;
+font-size:16px;
+}
+
+button{
+margin-top:12px;
+padding:12px 18px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-size:15px;
+background:linear-gradient(45deg,#ff7eb3,#65d6ce);
+color:white;
+transition:.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 15px #fff6;
+}
+
+.hidden{display:none}
+
+.options button{
+display:block;
+width:100%;
+margin:10px 0;
+}
+
+.quote{
+margin-top:20px;
+font-style:italic;
+opacity:.9;
+}
+
+.ai{
+margin-top:15px;
+opacity:.8;
+font-size:14px;
+}
+
+.loader{
+margin-top:20px;
+height:6px;
+background:#ffffff22;
+border-radius:5px;
+overflow:hidden;
+}
+
+.loader div{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#ff7eb3,#65d6ce);
+animation:load 3s forwards;
+}
+
+@keyframes load{
+to{width:100%}
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="card">
+
+<h1>🌌 Mood Space AI</h1>
+
+<div id="step1">
+<p>Enter your name</p>
+<input id="nameInput">
+<button onclick="start()">Enter Space</button>
+</div>
+
+<div id="loading" class="hidden">
+<p>🧠 AI analyzing emotional frequency...</p>
+<div class="loader"><div></div></div>
+</div>
+
+<div id="step2" class="hidden">
+<h2 id="welcome"></h2>
+<p>Select your mood</p>
+
+<div class="options">
+<button onclick="mood('happy')">😊 Happy</button>
+<button onclick="mood('angry')">😡 Angry</button>
+<button onclick="mood('sad')">😢 Sad</button>
+</div>
+</div>
+
+<div id="step3" class="hidden">
+<h2 id="moodTitle"></h2>
+<div id="actions"></div>
+<p class="quote" id="quote"></p>
+<p class="ai" id="aiText"></p>
+</div>
+
+</div>
+
+<script>
+
+/* ---------- PARTICLE BACKGROUND ---------- */
+
+const canvas=document.getElementById("bg");
+const ctx=canvas.getContext("2d");
+
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+let particles=[];
+
+for(let i=0;i<80;i++){
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2,
+dx:(Math.random()-.5),
+dy:(Math.random()-.5)
+});
+}
+
+function animate(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="white";
+
+particles.forEach(p=>{
+p.x+=p.dx;
+p.y+=p.dy;
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ctx.fill();
+});
+
+requestAnimationFrame(animate);
+}
+animate();
+
+/* ---------- APP LOGIC ---------- */
+
+let user="";
+
+function start(){
+user=document.getElementById("nameInput").value;
+if(!user)return alert("Enter name");
+
+localStorage.setItem("moodUser",user);
+
+document.getElementById("step1").classList.add("hidden");
+document.getElementById("loading").classList.remove("hidden");
+
+setTimeout(()=>{
+document.getElementById("loading").classList.add("hidden");
+document.getElementById("step2").classList.remove("hidden");
+document.getElementById("welcome").innerText=
+`Welcome ${user} ✨ AI is ready.`;
+},3000);
+}
+
+function aiType(text){
+let el=document.getElementById("aiText");
+el.innerHTML="";
+let i=0;
+let typing=setInterval(()=>{
+el.innerHTML+=text.charAt(i);
+i++;
+if(i>=text.length)clearInterval(typing);
+},30);
+}
+
+function mood(m){
+
+document.getElementById("step2").classList.add("hidden");
+document.getElementById("step3").classList.remove("hidden");
+
+let actions=document.getElementById("actions");
+let quote=document.getElementById("quote");
+let title=document.getElementById("moodTitle");
+
+if(m==="happy"){
+document.body.style.background="#0f2027";
+title.innerText="Happy Energy Detected ✨";
+
+actions.innerHTML=`
+<button onclick="magic('hug')">🤗 Hug Abhishek</button>
+<button onclick="magic('kiss')">😘 Send Kiss</button>
+<button onclick="magic('gift')">🎁 Send Gift</button>
+`;
+
+quote.innerText="Joy multiplies when shared.";
+aiType("Your emotional wavelength is bright and stable.");
+}
+
+if(m==="angry"){
+document.body.style.background="#2b0b0b";
+title.innerText="Anger Detected 🔥";
+
+actions.innerHTML=`
+<button onclick="magic('slap')">👋 Slap Abhishek</button>
+<button onclick="magic('shoot')">🔫 Shoot Abhishek</button>
+<button onclick="magic('throw')">🪟 Throw Out Window</button>
+`;
+
+quote.innerText="Anger is power — use wisely.";
+aiType("High emotional turbulence detected.");
+}
+
+if(m==="sad"){
+document.body.style.background="#0b1b2b";
+title.innerText="Sadness Detected 💙";
+
+actions.innerHTML=`
+<button onclick="magic('hug')">🤗 Hug (50% Discount)</button>
+`;
+
+quote.innerText="Even stars shine brightest in darkness.";
+aiType("Comfort protocol activated.");
+}
+}
+
+function magic(action){
+
+const messages={
+hug:"🤗 Virtual Hug Delivered!",
+kiss:"😘 Cosmic Kiss Sent!",
+gift:"🎁 Gift Teleported!",
+slap:"👋 Slap registered!",
+shoot:"🔫 Pew pew!",
+throw:"🪟 Yeeted into space!"
+};
+
+alert(messages[action]);
+}
+
+/* restore user */
+if(localStorage.getItem("moodUser")){
+document.getElementById("nameInput").value=
+localStorage.getItem("moodUser");
+}
+
+</script>
+
+</body>
+</html>
